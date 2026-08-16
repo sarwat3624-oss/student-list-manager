@@ -1,8 +1,6 @@
-const API_URL =
-  "https://jsonplaceholder.typicode.com/users";
+const API_URL = "http://localhost:5000/api/students";
 
 export async function fetchStudents() {
-
   const response = await fetch(API_URL);
 
   if (!response.ok) {

@@ -116,51 +116,27 @@ function App() {
   // ==================================================
 
   async function loadStudents() {
-    try {
-      setLoading(true);
-      setError("");
+  try {
+    setLoading(true);
+    setError("");
 
-      const savedStudents = localStorage.getItem("students");
+    const data = await fetchStudents();
 
-      if (savedStudents) {
-        const studentsFromStorage =
-          JSON.parse(savedStudents);
+    const formattedStudents = data.map((student) => ({
+  id: student._id,
+  name: student.name,
+  age: student.age,
+  className: student.className,
+}));
+    setStudents(formattedStudents);
+  } catch (err) {
+    console.log("Error:", err);
 
-        setStudents(studentsFromStorage);
-        return;
-      }
-
-      const data = await fetchStudents();
-
-      const formattedStudents = data.map(
-        (user, index) => ({
-          id: user.id,
-          name: user.name,
-          className: [
-            "8th",
-            "9th",
-            "10th",
-            "11th",
-            "12th",
-          ][index % 5],
-          age: 17 + (index % 3),
-        })
-      );
-
-      localStorage.setItem(
-        "students",
-        JSON.stringify(formattedStudents)
-      );
-
-      setStudents(formattedStudents);
-    } catch (err) {
-      console.log("Error:", err);
-
-      setError("Failed to load students.");
-    } finally {
-      setLoading(false);
-    }
+    setError("Failed to load students.");
+  } finally {
+    setLoading(false);
   }
+}
 
   // ==================================================
   // LOAD STUDENTS ON START
@@ -186,45 +162,66 @@ function App() {
   // ADD STUDENT
   // ==================================================
 
-  function addStudent(student) {
-    const newStudent = {
-      ...student,
-      id: Date.now(),
-    };
+  async function addStudent(student) {
+  try {
+    const response = await fetch(
+      "http://localhost:5000/api/students",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: student.name,
+          age: student.age,
+          className: student.className,
+        }),
+      }
+    );
 
-    setStudents((previousStudents) => {
-      const updatedStudents = [
-        ...previousStudents,
-        newStudent,
-      ];
+    if (!response.ok) {
+      throw new Error("Failed to add student");
+    }
 
-      localStorage.setItem(
-        "students",
-        JSON.stringify(updatedStudents)
-      );
+    const newStudent = await response.json();
 
-      return updatedStudents;
-    });
+    setStudents((previousStudents) => [
+  ...previousStudents,
+  {
+    id: newStudent._id,
+    name: newStudent.name,
+    age: newStudent.age,
+    className: newStudent.className,
+  },
+]);
+  } catch (error) {
+    console.log("Add student error:", error);
+    setError("Failed to add student.");
   }
+}
 
   // ==================================================
   // DELETE STUDENT
   // ==================================================
 
-  function deleteStudent(id) {
-    setStudents((previousStudents) => {
-      const updatedStudents =
-        previousStudents.filter(
-          (student) => student.id !== id
-        );
+ async function deleteStudent(id) {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/students/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
 
-      localStorage.setItem(
-        "students",
-        JSON.stringify(updatedStudents)
-      );
+    if (!response.ok) {
+      throw new Error("Failed to delete student");
+    }
 
-      return updatedStudents;
-    });
+    setStudents((previousStudents) =>
+      previousStudents.filter(
+        (student) => student.id !== id
+      )
+    );
 
     setAttendance((previousAttendance) => {
       const updatedAttendance = {
@@ -240,8 +237,11 @@ function App() {
 
       return updatedAttendance;
     });
+  } catch (error) {
+    console.log("Delete error:", error);
+    setError("Failed to delete student.");
   }
-
+}
   // ==================================================
   // EDIT STUDENT
   // ==================================================
@@ -263,26 +263,49 @@ function App() {
   // SAVE EDITED STUDENT
   // ==================================================
 
-  function saveEditedStudent(updatedStudent) {
-    setStudents((previousStudents) => {
-      const updatedStudents =
-        previousStudents.map((student) =>
-          student.id === updatedStudent.id
-            ? updatedStudent
-            : student
-        );
+  async function saveEditedStudent(updatedStudent) {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/students/${updatedStudent.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: updatedStudent.name,
+          age: updatedStudent.age,
+          className: updatedStudent.className,
+        }),
+      }
+    );
 
-      localStorage.setItem(
-        "students",
-        JSON.stringify(updatedStudents)
-      );
+    if (!response.ok) {
+      throw new Error("Failed to update student");
+    }
 
-      return updatedStudents;
-    });
+    const data = await response.json();
+
+setStudents((previousStudents) =>
+  previousStudents.map((student) =>
+    student.id === data.student._id
+      ? {
+          id: data.student._id,
+          name: data.student.name,
+          age: data.student.age,
+          className: data.student.className,
+        }
+      : student
+  )
+);
 
     setShowEditForm(false);
     setEditingStudent(null);
+  } catch (error) {
+    console.log("Update error:", error);
+    setError("Failed to update student.");
   }
+}
 
   // ==================================================
   // CANCEL EDIT
