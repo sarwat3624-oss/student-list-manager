@@ -12,7 +12,12 @@ import Students from "./Students";
 import Home from "./Home";
 import About from "./About";
 import StudentDetails from "./StudentDetails";
-import { fetchStudents } from "./services/studentApi";
+import {
+  fetchStudents,
+  addStudent as addStudentAPI,
+  updateStudent as updateStudentAPI,
+  deleteStudent as deleteStudentAPI,
+} from "./services/studentApi";
 import "./App.css";
 
 function App() {
@@ -164,58 +169,33 @@ function App() {
 
   async function addStudent(student) {
   try {
-    const response = await fetch(
-      "http://localhost:5000/api/students",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: student.name,
-          age: student.age,
-          className: student.className,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to add student");
-    }
-
-    const newStudent = await response.json();
+    const newStudent = await addStudentAPI({
+      name: student.name,
+      age: student.age,
+      className: student.className,
+    });
 
     setStudents((previousStudents) => [
-  ...previousStudents,
-  {
-    id: newStudent._id,
-    name: newStudent.name,
-    age: newStudent.age,
-    className: newStudent.className,
-  },
-]);
+      ...previousStudents,
+      {
+        id: newStudent._id,
+        name: newStudent.name,
+        age: newStudent.age,
+        className: newStudent.className,
+      },
+    ]);
   } catch (error) {
     console.log("Add student error:", error);
     setError("Failed to add student.");
   }
 }
-
   // ==================================================
   // DELETE STUDENT
   // ==================================================
 
  async function deleteStudent(id) {
   try {
-    const response = await fetch(
-      `http://localhost:5000/api/students/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to delete student");
-    }
+    await deleteStudentAPI(id);
 
     setStudents((previousStudents) =>
       previousStudents.filter(
@@ -265,39 +245,27 @@ function App() {
 
   async function saveEditedStudent(updatedStudent) {
   try {
-    const response = await fetch(
-      `http://localhost:5000/api/students/${updatedStudent.id}`,
+    const data = await updateStudentAPI(
+      updatedStudent.id,
       {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: updatedStudent.name,
-          age: updatedStudent.age,
-          className: updatedStudent.className,
-        }),
+        name: updatedStudent.name,
+        age: updatedStudent.age,
+        className: updatedStudent.className,
       }
     );
 
-    if (!response.ok) {
-      throw new Error("Failed to update student");
-    }
-
-    const data = await response.json();
-
-setStudents((previousStudents) =>
-  previousStudents.map((student) =>
-    student.id === data.student._id
-      ? {
-          id: data.student._id,
-          name: data.student.name,
-          age: data.student.age,
-          className: data.student.className,
-        }
-      : student
-  )
-);
+    setStudents((previousStudents) =>
+      previousStudents.map((student) =>
+        student.id === data.student._id
+          ? {
+              id: data.student._id,
+              name: data.student.name,
+              age: data.student.age,
+              className: data.student.className,
+            }
+          : student
+      )
+    );
 
     setShowEditForm(false);
     setEditingStudent(null);
@@ -306,7 +274,6 @@ setStudents((previousStudents) =>
     setError("Failed to update student.");
   }
 }
-
   // ==================================================
   // CANCEL EDIT
   // ==================================================

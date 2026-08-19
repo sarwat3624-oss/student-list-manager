@@ -3,9 +3,17 @@ const Student = require("../models/Student");
 // GET all students
 const getStudents = async (req, res) => {
   try {
-    const className = req.query.className;
+    const { className, name } = req.query;
 
-    const filter = className ? { className } : {};
+    const filter = {};
+
+    if (className) {
+      filter.className = className;
+    }
+
+    if (name) {
+      filter.name = { $regex: name, $options: "i" };
+    }
 
     const students = await Student.find(filter);
 
@@ -17,7 +25,6 @@ const getStudents = async (req, res) => {
     });
   }
 };
-
 // GET single student
 const getStudentById = async (req, res) => {
   try {
