@@ -2485,3 +2485,32 @@ select {
     width: calc(100% - 70px);
   }
 }
+/* ============================= */
+/* LOGIN PAGE */
+/* ============================= */
+
+/* ============================= */
+/* LOGIN PAGE */
+/* ============================= */
+
+.dashboard.login-page {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: block;
+  background: #f4f7fb;
+}
+
+.dashboard.login-page .main-content.login-main {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #f4f7fb;
+}

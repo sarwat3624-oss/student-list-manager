@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import StudentCard from "./StudentCard";
 import StudentForm from "./StudentForm";
 import NotFound from "./NotFound";
@@ -12,6 +12,7 @@ import Students from "./Students";
 import Home from "./Home";
 import About from "./About";
 import StudentDetails from "./StudentDetails";
+import Login from "./Login";
 import {
   fetchStudents,
   addStudent as addStudentAPI,
@@ -22,6 +23,7 @@ import "./App.css";
 
 function App() {
    const navigate = useNavigate();
+   const location = useLocation();
     
   // ==================================================
   // STUDENTS
@@ -407,7 +409,9 @@ function App() {
   // ==================================================
   const routerContent = (
   <Routes>
-    <Route path="/" element={<Dashboard
+     <Route path="/login" element={<Login />} />
+     <Route path="/" element={<Login />} />
+    <Route path="/dashboard" element={<Dashboard
   academyName={academyName}
   adminName={adminName}
   currentTime={currentTime}
@@ -490,9 +494,14 @@ function App() {
 );
 
   return (
-  <div className="dashboard">
-
-    <aside className="sidebar">
+  
+  <div className={
+  location.pathname === "/login" || location.pathname === "/"
+    ? "dashboard login-page"
+    : "dashboard"
+}>
+    {location.pathname !== "/login" && location.pathname !== "/" && (
+  <aside className="sidebar">
 
       <div className="brand">
 
@@ -567,9 +576,14 @@ function App() {
 
       </div>
 
-    </aside>
+      </aside>
+)}
 
-    <main className="main-content">
+    <main className={
+  location.pathname === "/login" || location.pathname === "/"
+    ? "main-content login-main"
+    : "main-content"
+}>
 
       {routerContent}
 
