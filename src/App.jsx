@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
 import StudentCard from "./StudentCard";
 import StudentForm from "./StudentForm";
 import NotFound from "./NotFound";
@@ -24,6 +24,10 @@ import "./App.css";
 function App() {
    const navigate = useNavigate();
    const location = useLocation();
+   function handleLogout() {
+  localStorage.removeItem("token");
+  navigate("/login");
+}
     
   // ==================================================
   // STUDENTS
@@ -403,6 +407,15 @@ function App() {
       </div>
     );
   }
+  const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
 
   // ==================================================
   // MAIN APP
@@ -411,26 +424,33 @@ function App() {
   <Routes>
      <Route path="/login" element={<Login />} />
      <Route path="/" element={<Login />} />
-    <Route path="/dashboard" element={<Dashboard
-  academyName={academyName}
-  adminName={adminName}
-  currentTime={currentTime}
-  students={students}
-  filteredStudents={filteredStudents}
-  presentCount={presentCount}
-  absentCount={absentCount}
-  attendancePercentage={attendancePercentage}
-  totalClasses={totalClasses}
-  search={search}
-  setSearch={setSearch}
-  selectedClass={selectedClass}
-  setSelectedClass={setSelectedClass}
-  handleRefresh={handleRefresh}
-  addStudent={addStudent}
-  setActivePage={setActivePage}
-  deleteStudent={deleteStudent}
-  editStudent={editStudent}
-/>} />
+   <Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <Dashboard
+        academyName={academyName}
+        adminName={adminName}
+        currentTime={currentTime}
+        students={students}
+        filteredStudents={filteredStudents}
+        presentCount={presentCount}
+        absentCount={absentCount}
+        attendancePercentage={attendancePercentage}
+        totalClasses={totalClasses}
+        search={search}
+        setSearch={setSearch}
+        selectedClass={selectedClass}
+        setSelectedClass={setSelectedClass}
+        handleRefresh={handleRefresh}
+        addStudent={addStudent}
+        setActivePage={setActivePage}
+        deleteStudent={deleteStudent}
+        editStudent={editStudent}
+      />
+    </ProtectedRoute>
+  }
+/>
     <Route path="/home" element={<Home />} />
     <Route path="/about" element={<About />} />
     <Route
@@ -524,7 +544,7 @@ function App() {
 
         <button
   className="nav-item"
-  onClick={() => navigate("/")}
+  onClick={() => navigate("/dashboard")}
 >
   <span>▦</span>
   Dashboard
@@ -566,15 +586,23 @@ function App() {
 
       <div className="sidebar-bottom">
 
-        <p>
-          Student Manager
-        </p>
+  <button
+    className="nav-item logout-btn"
+    onClick={handleLogout}
+  >
+    <span>↪</span>
+    Logout
+  </button>
 
-        <small>
-          React Day 4 Project
-        </small>
+  <p>
+    Student Manager
+  </p>
 
-      </div>
+  <small>
+    React Day 4 Project
+  </small>
+
+</div>
 
       </aside>
 )}

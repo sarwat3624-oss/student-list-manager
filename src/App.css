@@ -2263,9 +2263,8 @@ select {
   }
 
   .sidebar-bottom {
-    display: none;
-  }
-
+  display: none;
+}
   .main-content {
     width: calc(100% - 75px);
 
@@ -2513,4 +2512,48 @@ select {
   align-items: center;
 
   background: #f4f7fb;
+}
+/* ============================= */
+/* MOBILE LOGOUT FIX */
+/* ============================= */
+
+@media (max-width: 800px) {
+  .sidebar-bottom {
+    display: block !important;
+    margin-top: auto;
+    padding: 10px 0;
+  }
+
+  .sidebar-bottom .logout-btn {
+    display: flex !important;
+    width: 100%;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 10px !important;
+    font-size: 0 !important;
+    color: #c2b9ae !important;
+    background: transparent !important;
+  }
+
+  .sidebar-bottom .logout-btn span {
+    display: block !important;
+    width: auto !important;
+    font-size: 22px !important;
+    color: #c2b9ae !important;
+  }
+
+  .sidebar-bottom .logout-btn:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+  }
+
+  .sidebar-bottom .logout-btn:hover span {
+    color: white !important;
+  }
+
+  .sidebar-bottom p,
+  .sidebar-bottom small {
+    display: none !important;
+  }
 }
